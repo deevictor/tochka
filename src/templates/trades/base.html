@@ -1,0 +1,31 @@
+ {% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tochka</title>
+
+  </head>
+  <body>
+    <header>
+      <h1>Viktor Di</h1>
+        <br />
+        <br />
+        <br />
+          <input id="nasdaq" type="button" value="Parse NASDAQ" />
+        <h2>Welcome!</h2>
+      <hr>
+    </header>
+    <main>
+      {% block content %}
+      {% endblock content%}
+    </main>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  </body>
+  <script>
+    var nasdaq_url = "{% url 'trades:parse_nasdaq' %}";
+  </script>
+  <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+</html>
