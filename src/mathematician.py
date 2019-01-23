@@ -4,6 +4,10 @@ from contextlib import closing
 from bs4 import BeautifulSoup
 
 
+def get_html(raw_html):
+    return BeautifulSoup(raw_html, 'html.parser')
+
+
 def simple_get(url):
     try:
         with closing(get(url, stream=True)) as resp:
