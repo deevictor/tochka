@@ -7,3 +7,4 @@ for company in companies:
     data.append(pull_prices(company))
 
 print(data)
+
