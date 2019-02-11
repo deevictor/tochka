@@ -1,9 +1,12 @@
-from mylib import pull_prices
+from requests import get
+from bs4 import BeautifulSoup
 
+company = 'aapl'
+url = f"https://www.nasdaq.com/symbol/{company}/historical"
 
-companies = ['aapl',]
-data = []
-for company in companies:
-    data.append(pull_prices(company))
-
-print(data)
+response = get(url)
+# print(response.text[:1000])
+html_soup = BeautifulSoup(response.text, 'html.parser')
+# lines = html_soup.find_all('')
+chunk = html_soup.find(id="historicalContainer").find("tbody").find_all('tr')
+print(type(chunk))
