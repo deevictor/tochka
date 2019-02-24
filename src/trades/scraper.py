@@ -1,6 +1,6 @@
 import time
 
-from mylib import parse_insider_trades, parse_prices
+from trades.mylib import parse_insider_trades, parse_prices
 
 
 # companies = ['aapl', 'cvx', 'goog']

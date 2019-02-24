@@ -1,0 +1,39 @@
+ {% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FStask1</title>
+
+  </head>
+  <body>
+    <header>
+      <h1>My Site</h1>
+        <br />
+        <br />
+        <br />
+{#        <a href="{% url 'contact_admins' %}" class="top-menu-small">contact administrator</a>#}
+{#        &nbsp;<a href="{% url 'trades:parse_nasdaq' %}">Parse NASDAQ</a><br>#}
+          <input id="nasdaq" type="button" value="Parse NASDAQ" />
+{#        <a href="{% url 'contact' %}" class="top-menu-small">send message</a>#}
+{#      {% else %}#}
+        <h2>Welcome new user!</h2>
+{#        <a href="{% url 'login' %}">login</a>#}
+        &nbsp;
+{#        <a href="{% url 'signup' %}">signup</a>#}
+{#      {% endif %}#}
+      <hr>
+    </header>
+    <main>
+      {% block content %}
+      {% endblock content%}
+    </main>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  </body>
+  <script>
+    var nasdaq_url = "{% url 'trades:parse_nasdaq' %}";
+  </script>
+  <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+</html>
