@@ -16,3 +16,11 @@ class BlogSpider(scrapy.Spider):
         content = response.xpath(".//div[@class='entry-content']/descendant::text()").extract()
         yield {'article': ''.join(content)}
 
+
+result = [
+    [row1, row2, row3], [row8, row9, row10]
+]
+
+data = [
+    2, -10, 3, 15, 7, -1, -6, 10, 7, -4, 2, 9, 1, 0, -5, 0, 9, -2, -5, 1, 10
+]
