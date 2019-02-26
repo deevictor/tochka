@@ -1,0 +1,24 @@
+{% extends 'trades/base.html' %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+  <a href="{% url 'trades:insider' company%}">insider trades</a>
+  <br><br>
+    {% if date_form %}
+        <form method="get" id="dates_form">
+            {{ date_form }}
+        <button type="submit" name="date_form">Submit</button>
+        </form>
+        <br>
+    {% endif %}
+    {% if delta_form %}
+        <form method="get" id="dates_form">
+        {{ delta_form }}
+        <button type="submit" name="delta_form">Submit</button>
+        </form>
+        <br>
+    {% endif %}
+  {% if prices %}
+    {% render_table prices %}
+  {% endif %}
+{% endblock content %}
