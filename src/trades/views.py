@@ -1,40 +1,33 @@
-import os
-import json
+from datetime import datetime
 from decimal import Decimal, DecimalException
 
-from django.db.models import Sum
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.core.management import call_command
 from django.core.management.commands import flush
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
-
-import locale
-from datetime import datetime
-
-from django.urls import reverse
 from django_tables2 import RequestConfig
 
 from tochka.settings import TICKERS_FILE, BASE_DIR, PROJECT_ROOT
-from trades.mylib import (parse_insider_trades, parse_prices, get_min_sets,
-                          get_sets_sql)
+from trades.mylib import parse_insider_trades, parse_prices, get_sets_sql
 from .forms import DatesForm, DeltaForm
 from .tables import StockPriceTable, TradeTable
 from .serializers import StockPriceSerializer, TradeSerializer
-
 from .models import Owner,  Company, Relation, Trade, StockPrice
 
 # Create your views here.
 
 
 def home(request):
+    """Базовая страница."""
+
     context = {}
     print(BASE_DIR, PROJECT_ROOT)
     return render(request, 'trades/base.html', context)
 
 
 def insider(request, company, api=None):
+    """Возвращает данные о торговле совладельцев компании."""
+
     context = {}
     trades = Trade.objects.filter(company__name=company).order_by('-last_date')
     if api == 'api':
@@ -48,6 +41,8 @@ def insider(request, company, api=None):
 
 
 def insider_name(request, company, name, api=None):
+    """Возвращает данные о торговле конкретного владельца компании."""
+
     context = {}
     name = name.replace('_', ' ')
     trades = Trade.objects.filter(
@@ -64,12 +59,8 @@ def insider_name(request, company, name, api=None):
 
 
 def ticker(request, company, api=None):
-    """Отображает страницу контактов
+    """Возвращает цены акций комании за последние 3 месяца."""
 
-    Контексты:
-    form (object): форма для отправки сообщений пользователями
-    flag (bool):  если True то форма на странице не показывается
-    """
     date_form = DatesForm(request.GET or None)
     delta_form = DeltaForm(request.GET or None)
     context = {}
@@ -102,18 +93,39 @@ def ticker(request, company, api=None):
 
 
 def ticker_delta(request, company, api=None):
+    """
+    Возвращает цены акций компании последовательных дней в которых
+    кумулятивная дельта больше или равна заданному порогу.
+    """
+
     context = {}
     delta_form = DeltaForm(request.GET or None)
-    prices = StockPrice.objects.filter(company__name=company).order_by('-date')
+    tables = None
     if delta_form.is_valid():
-        value = delta_form.cleaned_data.get('value')
+        value = abs(delta_form.cleaned_data.get('value'))
         type = delta_form.cleaned_data.get('type')
-        # result = get_min_sets(prices, value, type)
-        rows = get_sets_sql()
-        print('done')
+        company_id = Company.objects.get(name=company).id
+        rows = get_sets_sql(value, company_id, type)
+        query_sets = [
+            StockPrice.objects.filter(
+                id__gte=row.startid, id__lte=row.startid + row.setsize
+            ).order_by('-date') for row in rows
+        ]
+        if api == 'api':
+            serializers = [
+                StockPriceSerializer(qs, many=True).data for qs in query_sets
+            ]
+            return JsonResponse(serializers, safe=False)
+        tables = [StockPriceTable(qs) for qs in query_sets]
+    context.update(
+        tables=tables, delta_form=delta_form, company=company
+    )
+    return render(request, 'trades/tickers.html', context)
 
 
 def ticker_analytics(request, company, api=None):
+    """Возвращает ценный акций в заданном временном интервале."""
+
     context = {}
     date_form = DatesForm(request.GET or None)
     prices = StockPrice.objects.filter(company__name=company).order_by(
@@ -134,6 +146,7 @@ def ticker_analytics(request, company, api=None):
 
 
 def date_parse(text):
+    """Функция для форматирования дат."""
     try:
         return datetime.strptime(text, '%m/%d/%Y').date()
     except ValueError:
@@ -141,13 +154,11 @@ def date_parse(text):
 
 
 def parse_nasdaq(request):
+    """Функция для парсинга nasdaq и наполнения БД."""
+
     prices_data = None
     insider_trades_data = None
-    context = {}
-    result = {
-        'success': True,
-        'message': 'parse_nasdaq view is called!'
-    }
+    result = {'message': 'Parsing is finished!'}
 
     tickers_file = TICKERS_FILE
     with open(tickers_file) as f:
@@ -157,12 +168,12 @@ def parse_nasdaq(request):
         prices_data = parse_prices(companies, 10)
     except TypeError as e:
         error = f'prices parsing failed: {e}'
-        result.update(success=False, message=error)
+        result.update(message=error)
     try:
         insider_trades_data = parse_insider_trades(companies, 10)
     except TypeError as e:
         error = f'prices parsing failed: {e}'
-        result.update(success=False, message=error)
+        result.update(message=error)
 
     if prices_data:
         # truncate all tables
@@ -208,6 +219,5 @@ def parse_nasdaq(request):
                         shares_held=int(row[7].replace(',', ''))
                     )
 
-    print('Done!')
     return JsonResponse(result)
-    # return render(request, 'trades/base.html', context)
+

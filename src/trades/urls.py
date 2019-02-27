@@ -11,6 +11,9 @@ urlpatterns = (
         '<slug:company>/delta',
         views.ticker_delta, name='ticker_delta'),
     path(
+        '<slug:company>/delta/<api>',
+        views.ticker_delta, name='ticker_delta_api'),
+    path(
         '<slug:company>/analytics',
         views.ticker_analytics, name='ticker_analytics'),
     path(
@@ -29,5 +32,4 @@ urlpatterns = (
     path('<slug:company>/insider/<api>', views.insider, name='insider_api'),
     path('<slug:company>', views.ticker, name='ticker'),
     path('<slug:company>/<api>', views.ticker, name='ticker_api'),
-    # path('api', include('rest_framework.urls')),
 )
