@@ -40,8 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_tables2',
     'rest_framework',
-    'trades',
-    'ticker'
+    'trades'
 ]
 
 MIDDLEWARE = [
@@ -97,8 +96,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'tochka',
-        'USER': 'viktor',
-        'PASSWORD': 'viktor123',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '5432',
     }

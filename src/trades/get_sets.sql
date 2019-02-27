@@ -38,4 +38,4 @@ DO $$
 $$;
 SELECT *
 FROM SetDeltas
-WHERE ABS(setdelta) >= 15;
+WHERE ABS(setdelta) >= {threshold};

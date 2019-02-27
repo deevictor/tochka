@@ -7,18 +7,25 @@
     {% if date_form %}
         <form method="get" id="dates_form">
             {{ date_form }}
-        <button type="submit" name="date_form">Submit</button>
+            <button type="submit" name="date_form">Submit</button>
         </form>
         <br>
     {% endif %}
     {% if delta_form %}
         <form method="get" id="dates_form">
-        {{ delta_form }}
-        <button type="submit" name="delta_form">Submit</button>
+            {{ delta_form }}
+            <button type="submit" name="delta_form">Submit</button>
         </form>
         <br>
     {% endif %}
-  {% if prices %}
-    {% render_table prices %}
-  {% endif %}
+    {% if prices %}
+        {% render_table prices %}
+    {% endif %}
+
+    {% if tables %}
+        {% for table in tables %}
+            {% render_table table %}
+        {% endfor %}
+    {% endif %}
+
 {% endblock content %}
